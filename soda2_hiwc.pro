@@ -290,7 +290,7 @@ PRO soda2_hiwc
 
     subbase2b=widget_base(subbase2,row=1)
     specs=soda2_probespecs()
-	ispecs=where((specs.probename eq '2D-S Horizontal Array') or (specs.probename eq '2D-S Vertical Array') or (specs.probename eq 'HIWC PIP (SEA M300)'))
+	 ispecs=where((specs.probename eq '2D-S Horizontal Array') or (specs.probename eq '2D-S Vertical Array') or (specs.probename eq 'HIWC PIP (SEA M300)'))
     dummy=widget_label(subbase2b,value='Probe:',/align_left)
     probetype=widget_combobox(subbase2b,value=specs[ispecs].probename,uname='probetype',uvalue=specs[0].probename)
 
@@ -325,6 +325,6 @@ PRO soda2_hiwc
 
     soda2_imagedump  ;This is just to ensure imagedump is included with the 'package' command.
     WIDGET_CONTROL, base, /REALIZE
-    XMANAGER, 'soda2', base, /no_block
+    XMANAGER, 'soda2_hiwc', base, /no_block
 END
 
