@@ -85,10 +85,16 @@ PRO soda2_hiwc_event, ev
 
         'findpthfile': BEGIN ;===========================================================================
             IF ev.value eq 0 THEN BEGIN ;Add a file pressed
-               a=dialog_pickfile(/read,filter=['*.dat','*.sav','*.txt','*.csv'],title='Select flight data file',dialog_parent=widget_info(ev.top,find='process'),path=(*pinfo).rawpath)
+               a=dialog_pickfile(/read,filter=['IWG*'],title='Select flight data file',dialog_parent=widget_info(ev.top,find='process'),path=(*pinfo).rawpath)
                IF file_test(a) THEN BEGIN
+                  process_dc8_iwg_hiwc,{fn:a, rate:1.0, starttime:0, stoptime:200000}, /nosav, data=pth
                   widget_control,widget_info(ev.top,find='pthfile'),set_value=a
                   widget_control,widget_info(ev.top,find='tas'),sensitive=0
+                  widget_control,widget_info(ev.top,find='date'),set_value=pth.op.date
+                  istart=min(where(pth.tas gt 50))
+                  istop=max(where(pth.tas gt 50))
+                  widget_control,widget_info(ev.top,find='starttime'),set_value=sfm2hms(pth.time[istart])
+                  widget_control,widget_info(ev.top,find='stoptime'),set_value=sfm2hms(pth.time[istop])
                ENDIF
             ENDIF
             IF ev.value eq 1 THEN BEGIN ;Clear files pressed
@@ -175,8 +181,8 @@ PRO soda2_hiwc_event, ev
             IF probe.res eq 10 THEN endbins=[5,15,25,35,45,55,65,75,85,95,105,125,145,175,225,275,325,400,475,550,625,700,800,900,1000,1200,1400,1600,1800,2000]
 
             ;--------Bins
-            widget_control,widget_info(ev.top,find='endbins'),get_value=binstring
-            endbins=long(strsplit(binstring, '[ ,]+', /regex, /extract))
+            ;widget_control,widget_info(ev.top,find='endbins'),get_value=binstring
+            ;endbins=long(strsplit(binstring, '[ ,]+', /regex, /extract))
             
             ;-------Bin size checks
             warn=0 & go='Yes'
@@ -203,6 +209,9 @@ PRO soda2_hiwc_event, ev
                numdiodes:probe.numdiodes, probeid:probe.probeid, shortname:probe.shortname, greythresh:greythresh, $
                wavelength:probe.wavelength, seatag:probe.seatag, ncdfparticlefile:ncdfparticlefile}
 
+            ;Process DC-8 IWG data   
+            IF file_test(op.pth) THEN process_dc8_iwg_hiwc,{fn:op.pth, rate:op.rate, starttime:op.starttime, stoptime:op.stoptime, outdir:op.outdir}
+            
             ;Process housekeeping if flagged
             IF (housefile eq 1) and (probe.format eq 'SPEC') THEN BEGIN
                widget_control,widget_info(ev.top,find='process'),set_value='Housekeeping...'
@@ -273,7 +282,7 @@ PRO soda2_hiwc
     dummy=widget_label(subbase3,value='---Aircraft TAS Data---',/align_left)
     subbase3a=widget_base(subbase3,row=1)
     subbase3b=widget_base(subbase3,row=1)
-    addpthfile=cw_bgroup(subbase3a,['Select...','Clear'], uname='findpthfile',/row,label_left='Flight data file (DC-8 format):')
+    addpthfile=cw_bgroup(subbase3a,['Select...','Clear'], uname='findpthfile',/row,label_left='Flight data file (DC-8 IWG format):')
     pthfile=widget_text(subbase3,uname='pthfile',/editable,xsize=62,/all_events) 
     tas=cw_field(subbase3,/int, title='or use fixed TAS of (m/s):',uname='tas', value='220', xsize=4)
    
@@ -292,7 +301,7 @@ PRO soda2_hiwc
     specs=soda2_probespecs()
 	 ispecs=where((specs.probename eq '2D-S Horizontal Array') or (specs.probename eq '2D-S Vertical Array') or (specs.probename eq 'HIWC PIP (SEA M300)'))
     dummy=widget_label(subbase2b,value='Probe:',/align_left)
-    probetype=widget_combobox(subbase2b,value=specs[ispecs].probename,uname='probetype',uvalue=specs[0].probename)
+    probetype=widget_combobox(subbase2b,value=specs[ispecs].probename,uname='probetype',uvalue=specs[ispecs[0]].probename)
 
     ;subbase2e=widget_base(subbase2,row=1)
     ;binstring=string([25, 50, 100, 150, 200, 250, 300, 350, 400, 500, 600,700,800,900,1000,1200,1400,1600,1800,2000],form='(100(i0," "))')
