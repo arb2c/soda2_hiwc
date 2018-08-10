@@ -334,7 +334,7 @@ FUNCTION soda2_probespecs, name=name, id=id
    x.probetype='CIP'
    x.probeid=''
    x.res=100
-   x.armwidth=22.7
+   x.armwidth=22.2  ;Has Korolev tips
    x.numdiodes=64
    x.tau=0.051e-6
    x.firstsliceskip=0
