@@ -26,7 +26,7 @@ PRO soda2_hiwc_event, ev
             widget_control,widget_info(ev.top,find='pthfile'),set_value=op.pth
              
             ;--------Checkboxes
-            checkboxarray=[0,0,0,0,0]
+            checkboxarray=[0,0,0,0,0,0]
             id=widget_info(ev.top,find='options')
             widget_control,id,get_uvalue=values
             IF op.reconstruct eq 0 THEN checkboxarray[where(values eq 'All-In')]=1
@@ -53,7 +53,7 @@ PRO soda2_hiwc_event, ev
             widget_control,widget_info(ev.top,find='outdir'),set_value=op.outdir
             
             ;--------Bins
-            widget_control,widget_info(ev.top,find='endbins'),set_value=string(data.op.endbins,form='(100(i0," "))')
+            ;widget_control,widget_info(ev.top,find='endbins'),set_value=string(data.op.endbins,form='(100(i0," "))')
 
             ;--------Probe type
             id=widget_info(ev.top,find='probetype')
