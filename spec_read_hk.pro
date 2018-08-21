@@ -28,12 +28,10 @@ FUNCTION spec_read_hk, lun, bpoint, buffsize
    
    
    ;TAS in floating point binary: mantissa bits 0-22, exponent 23-30, sign 31
-   ;It appears that word 2 is always 0, ignore it (just higher precision stuff anyway)
    exponent=ishft(x[49] and '3f80'x,-7)+1  ;Only works for positive exponents
-   mantissa=1+total(dec2bin8(x[49] and '7f'x)/2^findgen(8))
+   mantissabits=[dec2bin8(x[49] and '7f'x), dec2bin16(x[50] and 'ffff'x)]
+   mantissa=1+total(mantissabits/2^findgen(24))
    tas=mantissa*2^exponent
-   IF x[50] gt 0 then print,'found higher precision tas'
-   ;print,exponent,mantissa,tas
    
    time=ishft(ulong(x[51]),16)+x[52] ;Assemble timeword
    
